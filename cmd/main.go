@@ -46,7 +46,7 @@ func main() {
 	repo := repository.InitRepo(dbConn)
 
 	appLog.Info("init services")
-	service := samplerService.InitService(appLog, repo)
+	service := samplerService.InitService(appLog, repo, appConf.RemoteHost)
 
 	appLog.Info("init http service")
 	appHTTPServer := routes.InitAppRouter(appLog, service, fmt.Sprintf(":%d", appConf.AppPort))
