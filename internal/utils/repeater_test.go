@@ -3,7 +3,7 @@ package utils_test
 import (
 	"context"
 	"fmt"
-	"go_project_template/internal/utils"
+	"sandbox/internal/utils"
 	"sync/atomic"
 	"testing"
 	"time"

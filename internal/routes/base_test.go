@@ -1,7 +1,7 @@
 package routes_test
 
 import (
-	testhelpers "go_project_template/internal/test_helpers"
+	testhelpers "sandbox/internal/test_helpers"
 	"testing"
 )
 

@@ -3,8 +3,8 @@ package utils_test
 import (
 	"context"
 	"fmt"
-	"go_project_template/internal/utils"
 	"net/http"
+	"sandbox/internal/utils"
 	"testing"
 	"time"
 

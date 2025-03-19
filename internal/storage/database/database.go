@@ -3,15 +3,14 @@ package database
 import (
 	"context"
 	"fmt"
-	"go_project_template/internal/config"
-	"go_project_template/internal/logger"
+	"sandbox/internal/config"
+	"sandbox/internal/logger"
 	"time"
-
-	"github.com/jmoiron/sqlx"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 

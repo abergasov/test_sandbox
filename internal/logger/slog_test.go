@@ -3,9 +3,9 @@ package logger_test
 import (
 	"bytes"
 	"fmt"
-	"go_project_template/internal/logger"
 	"io"
 	"os"
+	"sandbox/internal/logger"
 	"sync"
 	"testing"
 

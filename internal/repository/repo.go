@@ -1,6 +1,6 @@
 package repository
 
-import "go_project_template/internal/storage/database"
+import "sandbox/internal/storage/database"
 
 type Repo struct {
 	db database.DBConnector

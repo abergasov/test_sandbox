@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go_project_template/internal/logger"
-	"go_project_template/internal/routes"
 	"net/http"
+	"sandbox/internal/logger"
+	"sandbox/internal/routes"
 	"testing"
 
 	"github.com/phayes/freeport"
