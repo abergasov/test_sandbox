@@ -47,7 +47,15 @@ func (s *Server) initRoutes() {
 		return ctx.JSON(msgList)
 	})
 	s.httpEngine.Get("/api/message/:id", func(ctx *fiber.Ctx) error {
-		return nil
+		pID, err := ctx.ParamsInt("id")
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
+		}
+		msg, err := s.service.GetMessageByID(ctx.Context(), uint64(pID))
+		if err != nil {
+			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		return ctx.JSON(msg)
 	})
 }
 
