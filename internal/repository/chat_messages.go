@@ -61,3 +61,9 @@ func (r *Repo) GetChatMessageByID(ctx context.Context, messageID uint64) (*entit
 	q := fmt.Sprintf("SELECT %s FROM %s WHERE message_id = $1", fieldsChatMessagesColumns, TableChatMessages)
 	return utils.QueryRowToStruct[entities.ChatMessage](ctx, r.db.Client(), q, messageID)
 }
+
+func (r *Repo) DeleteChatMessageByID(ctx context.Context, messageID uint64) error {
+	q := fmt.Sprintf("DELETE FROM %s WHERE message_id = $1", TableChatMessages)
+	_, err := r.db.Client().ExecContext(ctx, q, messageID)
+	return err
+}

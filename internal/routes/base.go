@@ -57,6 +57,16 @@ func (s *Server) initRoutes() {
 		}
 		return ctx.JSON(msg)
 	})
+	s.httpEngine.Delete("/api/message/:id", func(ctx *fiber.Ctx) error {
+		pID, err := ctx.ParamsInt("id")
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
+		}
+		if err = s.service.DeleteMessageID(ctx.Context(), uint64(pID)); err != nil {
+			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		return ctx.SendString("ok")
+	})
 }
 
 // Run starts the HTTP Server.

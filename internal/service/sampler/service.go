@@ -36,3 +36,7 @@ func (s *Service) GetAllMessages(ctx context.Context) ([]*entities.ChatMessage, 
 func (s *Service) GetMessageByID(ctx context.Context, messageID uint64) (*entities.ChatMessage, error) {
 	return s.repo.GetChatMessageByID(ctx, messageID)
 }
+
+func (s *Service) DeleteMessageID(ctx context.Context, messageID uint64) error {
+	return s.repo.DeleteChatMessageByID(ctx, messageID)
+}
