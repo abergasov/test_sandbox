@@ -34,7 +34,7 @@ func (s *Server) initRoutes() {
 		return ctx.SendString("pong")
 	})
 	s.httpEngine.Get("/api/init", func(ctx *fiber.Ctx) error {
-		if err := s.service.Init(ctx.Context()); err != nil {
+		if err := s.service.PrepareState(ctx.Context()); err != nil {
 			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 		return ctx.SendString("ok")
@@ -45,6 +45,9 @@ func (s *Server) initRoutes() {
 			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 		return ctx.JSON(msgList)
+	})
+	s.httpEngine.Get("/api/message/:id", func(ctx *fiber.Ctx) error {
+		return nil
 	})
 }
 

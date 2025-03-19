@@ -28,7 +28,36 @@ var (
 	fieldsChatMessagesColumns = strings.Join(fieldsChatMessages, ",")
 )
 
+func (r *Repo) SaveChatMessages(ctx context.Context, chats []entities.ChatMessage) error {
+	chunks := utils.ChunkSlice(chats, 20)
+	for _, chunk := range chunks {
+		q, p := utils.GenerateBulkInsertSQL(TableChatMessages, utils.PQParamPlaceholder, chunk, func(e entities.ChatMessage) map[string]interface{} {
+			return map[string]interface{}{
+				"chat_id":       e.ChatID,
+				"message_id":    e.MessageID,
+				"timestamp":     e.Timestamp,
+				"timestamp_num": e.TimestampNum,
+				"user_id":       e.UserID,
+				"message":       e.Message,
+				"reply_to":      e.ReplyTo,
+				"is_bot":        e.IsBot,
+				"is_deleted":    e.IsDeleted,
+				"is_edited":     e.IsEdited,
+			}
+		})
+		if _, err := r.db.Client().ExecContext(ctx, q, p...); err != nil {
+			return fmt.Errorf("failed to save chat messages: %w", err)
+		}
+	}
+	return nil
+}
+
 func (r *Repo) GetAllChatMessages(ctx context.Context) ([]*entities.ChatMessage, error) {
 	q := fmt.Sprintf("SELECT %s FROM %s", fieldsChatMessagesColumns, TableChatMessages)
 	return utils.QueryRowsToStruct[entities.ChatMessage](ctx, r.db.Client(), q)
+}
+
+func (r *Repo) GetChatMessageByID(ctx context.Context, messageID uint64) (*entities.ChatMessage, error) {
+	q := fmt.Sprintf("SELECT %s FROM %s WHERE message_id = $1", fieldsChatMessagesColumns, TableChatMessages)
+	return utils.QueryRowToStruct[entities.ChatMessage](ctx, r.db.Client(), q, messageID)
 }
