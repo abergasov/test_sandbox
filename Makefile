@@ -43,9 +43,7 @@ lint_d:
 
 stop: ## Stops the local environment
 	${info Stopping containers...}
-	docker container ls -q --filter name=${PROJECT_NAME} ; true
-	${info Dropping containers...}
-	docker rm -f -v $(shell docker container ls -q --filter name=${PROJECT_NAME}) ; true
+	docker compose down
 
 dev_up: stop ## Runs local environment
 	${info Running docker-compose up...}
@@ -61,7 +59,7 @@ build_in_docker: ## Builds binary in docker
 
 run: ## Runs binary local with environment in docker
 	${info Run app containered}
-	GIT_HASH=${FILE_HASH} docker compose -p ${PROJECT_NAME} up --build -d
+	GIT_HASH=${FILE_HASH} docker compose -p ${PROJECT_NAME} up --build
 
 migrate_new: ## Create new migration
 	migrate create -ext sql -dir migrations -seq data
