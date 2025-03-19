@@ -2,6 +2,7 @@ package sampler
 
 import (
 	"context"
+	"fmt"
 	"sandbox/internal/entities"
 	"sandbox/internal/logger"
 	"sandbox/internal/repository"
@@ -20,6 +21,22 @@ func InitService(log logger.AppLogger, repo *repository.Repo, remoteHost string)
 		repo:       repo,
 		log:        log.With(logger.WithService("sampler")),
 	}
+}
+
+func (s *Service) GetMessages(ctx context.Context, pagination *entities.Pagination) ([]*entities.ChatMessage, error) {
+	if pagination == nil {
+		return nil, fmt.Errorf("pagination is required")
+	}
+	if pagination.PerPage <= 0 {
+		return nil, fmt.Errorf("per_page should be greater than 0")
+	}
+	if pagination.Page <= 0 {
+		return nil, fmt.Errorf("page should be greater than 0")
+	}
+	if pagination.PerPage > 20 {
+		return nil, fmt.Errorf("per_page should be less than or equal to 20")
+	}
+	return s.repo.GetChatMessages(ctx, pagination)
 }
 
 func (s *Service) GetAllMessages(ctx context.Context) ([]*entities.ChatMessage, error) {

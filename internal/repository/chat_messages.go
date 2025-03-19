@@ -52,6 +52,11 @@ func (r *Repo) SaveChatMessages(ctx context.Context, chats []entities.ChatMessag
 	return nil
 }
 
+func (r *Repo) GetChatMessages(ctx context.Context, pagination *entities.Pagination) ([]*entities.ChatMessage, error) {
+	q := fmt.Sprintf("SELECT %s FROM %s ORDER BY message_id DESC LIMIT $1 OFFSET $2", fieldsChatMessagesColumns, TableChatMessages)
+	return utils.QueryRowsToStruct[entities.ChatMessage](ctx, r.db.Client(), q, pagination.PerPage, pagination.Page)
+}
+
 func (r *Repo) GetAllChatMessages(ctx context.Context) ([]*entities.ChatMessage, error) {
 	q := fmt.Sprintf("SELECT %s FROM %s", fieldsChatMessagesColumns, TableChatMessages)
 	return utils.QueryRowsToStruct[entities.ChatMessage](ctx, r.db.Client(), q)

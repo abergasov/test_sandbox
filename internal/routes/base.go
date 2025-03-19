@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"sandbox/internal/entities"
 	"sandbox/internal/logger"
 	"sandbox/internal/service/sampler"
 
@@ -41,6 +42,17 @@ func (s *Server) initRoutes() {
 	})
 	s.httpEngine.Get("/api/all_messages", func(ctx *fiber.Ctx) error {
 		msgList, err := s.service.GetAllMessages(ctx.Context())
+		if err != nil {
+			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		return ctx.JSON(msgList)
+	})
+	s.httpEngine.Post("/api/messages", func(ctx *fiber.Ctx) error {
+		var pg entities.Pagination
+		if err := ctx.BodyParser(&pg); err != nil {
+			return ctx.Status(http.StatusBadRequest).SendString(err.Error())
+		}
+		msgList, err := s.service.GetMessages(ctx.Context(), &pg)
 		if err != nil {
 			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
