@@ -7,7 +7,8 @@ type Repo struct {
 }
 
 var AllTables = []string{
-	// add table names here
+	TableChatMessages,
+	TableObserveChats,
 }
 
 func InitRepo(db database.DBConnector) *Repo {

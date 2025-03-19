@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"strings"
+
+	"github.com/georgysavva/scany/v2/sqlscan"
 )
 
 const (
@@ -56,4 +59,30 @@ func GenerateBulkInsertSQL[T any](
 
 	sqlI = fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", tableName, strings.Join(columns, ","), strings.Join(placeholders, ","))
 	return sqlI, params
+}
+
+func QueryRowsToStruct[T any](ctx context.Context, conn sqlscan.Querier, query string, args ...any) ([]*T, error) {
+	rows, err := conn.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	res := make([]*T, 0, 100)
+	for rows.Next() {
+		var t T
+		if err = sqlscan.NewRowScanner(rows).Scan(&t); err != nil {
+			return nil, err
+		}
+		res = append(res, &t)
+	}
+	return res, nil
+}
+
+func QueryRowToStruct[T any](ctx context.Context, conn sqlscan.Querier, query string, args ...any) (*T, error) {
+	var t T
+	if err := sqlscan.Get(ctx, conn, &t, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to get row: %w", err)
+	}
+	return &t, nil
 }

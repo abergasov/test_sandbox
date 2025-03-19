@@ -7,16 +7,6 @@ COVERAGE_THRESHOLD:=70
 COVERAGE_TOTAL := $(shell go tool cover -func=cover.out | grep total | grep -Eo '[0-9]+\.[0-9]+')
 COVERAGE_PASS_THRESHOLD := $(shell echo "$(COVERAGE_TOTAL) $(COVERAGE_THRESHOLD)" | awk '{print ($$1 >= $$2)}')
 
-init_repo: ## create necessary configs
-	cp configs/sample.common.env configs/common.env
-	cp configs/sample.app_conf.yml configs/app_conf.yml
-	cp configs/sample.app_conf_docker.yml configs/app_conf_docker.yml
-	find . -type f -name "*.go" -exec sed -i 's/go_project_template/${PROJECT_NAME}/g' {} +
-	find . -type f -name "*.mod" -exec sed -i 's/go_project_template/${PROJECT_NAME}/g' {} +
-	go mod tidy && go mod download
-	go install golang.org/x/tools/cmd/goimports@latest
-	goimports -local github.com/$(PROJECT_NAME) -w .
-
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
@@ -25,12 +15,6 @@ ifndef GOLANGCI_LINT
 	${info golangci-lint not found, installing golangci-lint@latest}
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 endif
-
-abi: ## generate abi struct
-	abigen --abi internal/service/web3/approver/erc20.abi.json --pkg approver --type Erc20 --out erc_20.go
-	mv erc_20.go internal/service/web3/approver/
-	abigen --abi internal/service/web3/swapper/stargate.abi.json --pkg swapper --type StargateRouter --out stargate_abi.go
-	mv stargate_abi.go internal/service/web3/swapper/
 
 gogen: ## generate code
 	${info generate code...}

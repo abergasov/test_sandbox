@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/ethereum/go-ethereum v1.11.6
+	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/google/uuid v1.5.0
@@ -11,7 +12,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/shopspring/decimal v1.2.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -31,7 +32,7 @@ require (
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
