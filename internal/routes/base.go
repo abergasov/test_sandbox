@@ -6,6 +6,7 @@ import (
 	"sandbox/internal/config"
 	"sandbox/internal/logger"
 	"sandbox/internal/service/sampler"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -31,6 +32,23 @@ func InitAppRouter(log logger.AppLogger, service *sampler.Service, conf *config.
 	return app
 }
 
+// authMiddleware is a middleware function to check for the auth token
+func (s *Server) authMiddleware(ctx *fiber.Ctx) error {
+	token := ctx.Get("Authorization")
+	if token == "" {
+		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"error": "missing authorization token",
+		})
+	}
+
+	if strings.TrimSpace(token) != s.conf.AuthToken {
+		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"error": "invalid token",
+		})
+	}
+	return ctx.Next()
+}
+
 func (s *Server) initRoutes() {
 	s.httpEngine.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("pong")
@@ -46,6 +64,12 @@ func (s *Server) initRoutes() {
 	s.httpEngine.Post("/api/message/:id", s.updateMessageByID)
 	s.httpEngine.Get("/api/message/:id", s.getMessageByID)
 	s.httpEngine.Delete("/api/message/:id", s.deleteMessageByID)
+
+	s.httpEngine.Get("/api/secret/all_messages", s.authMiddleware, s.getAllMessages)
+	s.httpEngine.Get("/api/secret/messages", s.authMiddleware, s.queryMessages)
+	s.httpEngine.Post("/api/secret/message/:id", s.authMiddleware, s.updateMessageByID)
+	s.httpEngine.Get("/api/secret/message/:id", s.authMiddleware, s.getMessageByID)
+	s.httpEngine.Delete("/api/secret/message/:id", s.authMiddleware, s.deleteMessageByID)
 }
 
 // Run starts the HTTP Server.
