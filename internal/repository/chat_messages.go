@@ -67,6 +67,11 @@ func (r *Repo) GetChatMessageByID(ctx context.Context, messageID uint64) (*entit
 	return utils.QueryRowToStruct[entities.ChatMessage](ctx, r.db.Client(), q, messageID)
 }
 
+func (r *Repo) UpdateChatMessageByID(ctx context.Context, messageID uint64, message *entities.EditChatMessage) error {
+	q := fmt.Sprintf("UPDATE %s SET message = $1, is_bot = $2 WHERE message_id = $3", TableChatMessages)
+	return checkUpdated(r.db.Client().ExecContext(ctx, q, message.NewText, message.IsBot, messageID))
+}
+
 func (r *Repo) DeleteChatMessageByID(ctx context.Context, messageID uint64) error {
 	q := fmt.Sprintf("DELETE FROM %s WHERE message_id = $1", TableChatMessages)
 	_, err := r.db.Client().ExecContext(ctx, q, messageID)

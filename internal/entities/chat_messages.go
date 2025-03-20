@@ -1,5 +1,9 @@
 package entities
 
+type EditChatMessage struct {
+	NewText string `json:"new_text"`
+	IsBot   bool   `json:"is_bot"`
+}
 type ChatMessage struct {
 	ChatID       uint64 `db:"chat_id" json:"chat_id"`
 	MessageID    uint64 `db:"message_id" json:"message_id"`

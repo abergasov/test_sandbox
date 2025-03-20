@@ -47,9 +47,9 @@ func (s *Server) initRoutes() {
 		}
 		return ctx.JSON(msgList)
 	})
-	s.httpEngine.Post("/api/messages", func(ctx *fiber.Ctx) error {
+	s.httpEngine.Get("/api/messages", func(ctx *fiber.Ctx) error {
 		var pg entities.Pagination
-		if err := ctx.BodyParser(&pg); err != nil {
+		if err := ctx.QueryParser(&pg); err != nil {
 			return ctx.Status(http.StatusBadRequest).SendString(err.Error())
 		}
 		msgList, err := s.service.GetMessages(ctx.Context(), &pg)
@@ -57,6 +57,20 @@ func (s *Server) initRoutes() {
 			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 		return ctx.JSON(msgList)
+	})
+	s.httpEngine.Post("/api/message/:id", func(ctx *fiber.Ctx) error {
+		pID, err := ctx.ParamsInt("id")
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
+		}
+		var msg entities.EditChatMessage
+		if err = ctx.BodyParser(&msg); err != nil {
+			return ctx.Status(http.StatusBadRequest).SendString(err.Error())
+		}
+		if err = s.service.UpdateMessageByID(ctx.Context(), uint64(pID), &msg); err != nil {
+			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		return ctx.SendString("ok")
 	})
 	s.httpEngine.Get("/api/message/:id", func(ctx *fiber.Ctx) error {
 		pID, err := ctx.ParamsInt("id")

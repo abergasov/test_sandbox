@@ -57,3 +57,7 @@ func (s *Service) GetMessageByID(ctx context.Context, messageID uint64) (*entiti
 func (s *Service) DeleteMessageID(ctx context.Context, messageID uint64) error {
 	return s.repo.DeleteChatMessageByID(ctx, messageID)
 }
+
+func (s *Service) UpdateMessageByID(ctx context.Context, messageID uint64, message *entities.EditChatMessage) error {
+	return s.repo.UpdateChatMessageByID(ctx, messageID, message)
+}
