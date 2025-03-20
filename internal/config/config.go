@@ -12,6 +12,7 @@ import (
 type AppConfig struct {
 	AppPort        int    `yaml:"app_port"`
 	MigratesFolder string `yaml:"migrates_folder"`
+	AuthToken      string `yaml:"auth_token"`
 	RemoteHost     string `yaml:"remote_host"`
 	ConfigDB       DBConf `yaml:"conf_db"`
 }

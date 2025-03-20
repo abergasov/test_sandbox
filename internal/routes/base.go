@@ -1,8 +1,9 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
-	"sandbox/internal/entities"
+	"sandbox/internal/config"
 	"sandbox/internal/logger"
 	"sandbox/internal/service/sampler"
 
@@ -11,16 +12,16 @@ import (
 )
 
 type Server struct {
-	appAddr    string
+	conf       *config.AppConfig
 	log        logger.AppLogger
 	service    *sampler.Service
 	httpEngine *fiber.App
 }
 
 // InitAppRouter initializes the HTTP Server.
-func InitAppRouter(log logger.AppLogger, service *sampler.Service, address string) *Server {
+func InitAppRouter(log logger.AppLogger, service *sampler.Service, conf *config.AppConfig) *Server {
 	app := &Server{
-		appAddr:    address,
+		conf:       conf,
 		httpEngine: fiber.New(fiber.Config{}),
 		service:    service,
 		log:        log.With(logger.WithService("http")),
@@ -40,65 +41,17 @@ func (s *Server) initRoutes() {
 		}
 		return ctx.SendString("ok")
 	})
-	s.httpEngine.Get("/api/all_messages", func(ctx *fiber.Ctx) error {
-		msgList, err := s.service.GetAllMessages(ctx.Context())
-		if err != nil {
-			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		return ctx.JSON(msgList)
-	})
-	s.httpEngine.Get("/api/messages", func(ctx *fiber.Ctx) error {
-		var pg entities.Pagination
-		if err := ctx.QueryParser(&pg); err != nil {
-			return ctx.Status(http.StatusBadRequest).SendString(err.Error())
-		}
-		msgList, err := s.service.GetMessages(ctx.Context(), &pg)
-		if err != nil {
-			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		return ctx.JSON(msgList)
-	})
-	s.httpEngine.Post("/api/message/:id", func(ctx *fiber.Ctx) error {
-		pID, err := ctx.ParamsInt("id")
-		if err != nil {
-			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
-		}
-		var msg entities.EditChatMessage
-		if err = ctx.BodyParser(&msg); err != nil {
-			return ctx.Status(http.StatusBadRequest).SendString(err.Error())
-		}
-		if err = s.service.UpdateMessageByID(ctx.Context(), uint64(pID), &msg); err != nil {
-			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		return ctx.SendString("ok")
-	})
-	s.httpEngine.Get("/api/message/:id", func(ctx *fiber.Ctx) error {
-		pID, err := ctx.ParamsInt("id")
-		if err != nil {
-			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
-		}
-		msg, err := s.service.GetMessageByID(ctx.Context(), uint64(pID))
-		if err != nil {
-			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		return ctx.JSON(msg)
-	})
-	s.httpEngine.Delete("/api/message/:id", func(ctx *fiber.Ctx) error {
-		pID, err := ctx.ParamsInt("id")
-		if err != nil {
-			return ctx.Status(http.StatusBadRequest).SendString("invalid message id")
-		}
-		if err = s.service.DeleteMessageID(ctx.Context(), uint64(pID)); err != nil {
-			return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		return ctx.SendString("ok")
-	})
+	s.httpEngine.Get("/api/all_messages", s.getAllMessages)
+	s.httpEngine.Get("/api/messages", s.queryMessages)
+	s.httpEngine.Post("/api/message/:id", s.updateMessageByID)
+	s.httpEngine.Get("/api/message/:id", s.getMessageByID)
+	s.httpEngine.Delete("/api/message/:id", s.deleteMessageByID)
 }
 
 // Run starts the HTTP Server.
 func (s *Server) Run() error {
-	s.log.Info("starting HTTP server", logger.WithString("port", s.appAddr))
-	return s.httpEngine.Listen(s.appAddr)
+	s.log.Info("starting HTTP server", logger.WithInt("port", s.conf.AppPort))
+	return s.httpEngine.Listen(fmt.Sprintf(":%d", s.conf.AppPort))
 }
 
 func (s *Server) Stop() error {

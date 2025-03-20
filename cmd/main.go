@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"sandbox/internal/config"
@@ -49,7 +48,7 @@ func main() {
 	service := samplerService.InitService(appLog, repo, appConf.RemoteHost)
 
 	appLog.Info("init http service")
-	appHTTPServer := routes.InitAppRouter(appLog, service, fmt.Sprintf(":%d", appConf.AppPort))
+	appHTTPServer := routes.InitAppRouter(appLog, service, appConf)
 	defer func() {
 		if err = appHTTPServer.Stop(); err != nil {
 			appLog.Fatal("unable to stop http service", err)
