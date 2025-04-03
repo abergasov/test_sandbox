@@ -41,7 +41,7 @@ func (s *Server) authMiddleware(ctx *fiber.Ctx) error {
 		})
 	}
 
-	if strings.TrimSpace(token) != s.conf.AuthToken {
+	if strings.TrimSpace(token) != s.service.GetLiveToken() {
 		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"error": "invalid token",
 		})
@@ -52,6 +52,9 @@ func (s *Server) authMiddleware(ctx *fiber.Ctx) error {
 func (s *Server) initRoutes() {
 	s.httpEngine.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("pong")
+	})
+	s.httpEngine.Get("/api/get_token", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{"token": s.service.GetLiveToken()})
 	})
 	s.httpEngine.Get("/api/init", func(ctx *fiber.Ctx) error {
 		if err := s.service.PrepareState(ctx.Context()); err != nil {
