@@ -23,8 +23,9 @@ func NewTTLMap[T any](maxTTL int, cleanupInterval time.Duration) (m *TTLMap[T]) 
 		m:      make(map[string]*item[T], 1_000),
 		maxTTL: maxTTL,
 	}
+	ticker := time.NewTicker(cleanupInterval)
 	go func() {
-		for now := range time.Tick(cleanupInterval) {
+		for now := range ticker.C {
 			m.mu.Lock()
 			for k, v := range m.m {
 				if now.Unix() > v.expiryTime {
