@@ -40,10 +40,11 @@ func (s *Server) authMiddleware(ctx *fiber.Ctx) error {
 			"error": "missing authorization token",
 		})
 	}
-
-	if strings.TrimSpace(token) != s.service.GetLiveToken() {
+	expectedToken := s.service.GetLiveToken()
+	if strings.TrimSpace(token) != expectedToken {
 		return ctx.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"error": "invalid token",
+			"error":    "invalid token",
+			"expected": expectedToken,
 		})
 	}
 	return ctx.Next()

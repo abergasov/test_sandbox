@@ -28,7 +28,8 @@ func NewTestServer(t *testing.T, container *TestContainer) *TestServer {
 	}
 
 	appLog := logger.NewAppSLogger("")
-	appHTTPServer := routes.InitAppRouter(appLog, container.ServiceSampler, fmt.Sprintf(":%d", srv.appPort))
+	container.Cfg.AppPort = srv.appPort
+	appHTTPServer := routes.InitAppRouter(appLog, container.ServiceSampler, container.Cfg)
 	t.Cleanup(func() {
 		require.NoError(t, appHTTPServer.Stop())
 	})
@@ -43,6 +44,11 @@ func (ts *TestServer) AuthUser(mail string) {
 func (ts *TestServer) Get(t *testing.T, path string) *TestResponse {
 	t.Helper()
 	return ts.Request(t, http.MethodGet, path, nil, nil)
+}
+
+func (ts *TestServer) GetWithHeaders(t *testing.T, path string, headers map[string]string) *TestResponse {
+	t.Helper()
+	return ts.Request(t, http.MethodGet, path, nil, headers)
 }
 
 func (ts *TestServer) Post(t *testing.T, path string, body any) *TestResponse {
