@@ -36,9 +36,10 @@ func (r *TestResponse) RequireStatus(t *testing.T, status int) {
 	require.Equal(t, status, r.Res.StatusCode, "invalid response status code")
 }
 
-func (r *TestResponse) RequireOk(t *testing.T) {
+func (r *TestResponse) RequireOk(t *testing.T) *TestResponse {
 	t.Helper()
 	r.RequireStatus(t, http.StatusOK)
+	return r
 }
 
 func (r *TestResponse) RequireCreated(t *testing.T) {

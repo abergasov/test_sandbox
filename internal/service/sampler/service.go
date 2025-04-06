@@ -6,21 +6,37 @@ import (
 	"sandbox/internal/entities"
 	"sandbox/internal/logger"
 	"sandbox/internal/repository"
+	ttlmap "sandbox/internal/utils/ttl_map"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type Service struct {
 	log        logger.AppLogger
 	repo       *repository.Repo
 	remoteHost string
+	ttlMap     *ttlmap.TTLMap[string]
 }
 
 func InitService(log logger.AppLogger, repo *repository.Repo, remoteHost string) *Service {
+	liveTime := 10 * time.Second
 	return &Service{
 		remoteHost: remoteHost,
 		repo:       repo,
 		log:        log.With(logger.WithService("sampler")),
+		ttlMap:     ttlmap.NewTTLMap[string](int(liveTime.Seconds()), 5*time.Second),
 	}
+}
+
+func (s *Service) GetLiveToken() string {
+	if token, ok := s.ttlMap.Get("token"); ok {
+		return token
+	}
+	token := uuid.NewString()
+	s.ttlMap.Put("token", token)
+	return token
 }
 
 func (s *Service) GetMessages(ctx context.Context, pagination *entities.Pagination) ([]*entities.ChatMessage, error) {
