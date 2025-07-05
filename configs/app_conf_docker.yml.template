@@ -1,0 +1,11 @@
+app_port: 8000
+migrates_folder: migrations
+auth_token: ${AUTH_TOKEN}
+remote_host: ${REMOTE_HOST}
+conf_db:
+  address: ${DB_ADDRESS}
+  port: ${DB_PORT}
+  user: ${DB_USER}
+  pass: ${DB_PASS}
+  db_name: sybill
+  max_connections: 10
