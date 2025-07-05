@@ -6,3 +6,4 @@ internal/service/web3/swapper/service_main_test.go
 cover.out
 cmd/*/*
 *.dat
+app_conf.yml

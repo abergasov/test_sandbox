@@ -1,4 +1,4 @@
-app_port: 8000
+app_port: 8001
 migrates_folder: migrations
 auth_token: QUReZgN4xAE3YOdrNVc5RKoaShLYmLlkN
 remote_host: http://185.211.5.95:48292
@@ -7,5 +7,5 @@ conf_db:
   port: 5432
   user: aHAjeK
   pass: AOifjwelmc8dw
-  db_name: sybill
+  db_name: dbPostgres
   max_connections: 10

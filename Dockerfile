@@ -29,5 +29,5 @@ COPY --from=build /app/bin/binary /app/
 COPY --from=build /app/configs/* /app/configs/
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 # RUN chmod +x /app/binary
-EXPOSE 8000/tcp
+EXPOSE 8001/tcp
 CMD /app/binary
